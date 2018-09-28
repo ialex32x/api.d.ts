@@ -133,42 +133,50 @@ interface WXSaveFileObj {
     complete?: WXCommonCallback
 }
 
+interface WXFileItem {
+    filePath: string
+    size: number
+    createTime: number
+}
+
+interface WXZipFileInfo extends WXCommonObj {
+    zipFilePath: string  //		是	源文件路径，只可以是 zip 压缩文件	
+    targetPath: string  //		是	目标目录路径	
+}
+
 type WXFileEncoding = "ascii" | "base64" | "binary" | "hex" | "ucs2" | "ucs-2" | "utf16le" | "utf-16le" | "utf-8" | "utf8" | "latin1";
 
 interface WXFileSystemManager {
-    saveFile(obj: WXSaveFileObj);
+    // 保存临时文件到本地。此接口会移动临时文件，因此调用成功后，tempFilePath 将不可用。
+    saveFile(obj: WXSaveFileObj)
+
+    // tempFilePath 临时存储文件路径
+    // filePath 要存储的文件路径
+    // return 存储后的文件路径 (文档错误??)
+    saveFileSync(tempFilePath: string, filePath: string): string
+
+    // 获取该小程序下已保存的本地缓存文件列表
     getSavedFileList(obj: {
-        success?: (res: {
-            fileList: {
-                filePath: string,
-                size: number,
-                createTime: number,
-            }[]
-        }) => void,
+        success?: (res: { fileList: WXFileItem[] }) => void,
         fail?: WXCommonCallback,
         complete?: WXCommonCallback,
     })
 
-    access(obj: {
-        filePath: string,
-        success?: (res: { errMsg: string }) => void,
-        fail?: WXCommonCallback,
-        complete?: WXCommonCallback,
-    }): void;
+    // 判断文件/目录是否存在
+    access(obj: { path: string } & WXCommonObj): void;
 
     // return errMsg
-    accessSync(filePath: string): string;
+    // 判断文件/目录是否存在
+    accessSync(path: string): string;
 
-    // 基础库 1.9.9 开始支持
+    // 写文件 (基础库 1.9.9 开始支持)
     writeFile(res: {
         filePath: string,
         data: string | ArrayBuffer,
         encoding?: WXFileEncoding,
-        success?: WXCommonCallback,
-        fail?: WXCommonCallback,
-        complete?: WXCommonCallback,
-    })
-    writeFileSync(filePath: string, data: string | ArrayBuffer, encoding?: WXFileEncoding)
+    } & WXCommonObj)
+    writeFileSync(filePath: string, data: string | ArrayBuffer, encoding?: WXFileEncoding): string
+
     // 基础库 1.9.9 开始支持
     readFile(res: {
         filePath: string,
@@ -181,6 +189,46 @@ interface WXFileSystemManager {
     // encoding: 指定读取文件的字符编码，如果不传 encoding， 则以 ArrayBuffer 格式读取文件的二进制内容
     // 基础库 1.9.9 开始支持
     readFileSync(filePath: string, encoding?: WXFileEncoding): string | ArrayBuffer
+
+    // 解压
+    unzip(obj: WXZipFileInfo)
+
+    // 删除文件
+    unlink(obj: {
+        filePath: string
+    } & WXCommonObj)
+
+    unlinkSync(filePath: string): string
+
+    copyFile(obj: {
+        srcPath: string     // 源文件路径，只可以是普通文件
+        destPath: string    // 目标文件路径
+    } & WXCommonObj)
+
+    copyFile(srcPath: string, destPath: string): string
+
+    // 支持版本 >= 2.1.0
+    // 在文件结尾追加内容
+    appendFile(obj: {
+        filePath: string            //		是	要追加内容的文件路径	
+        data: string | ArrayBuffer  //		是	要追加的文本或二进制数据	
+        encoding?: WXFileEncoding   //	utf8	否	指定写入文件的字符编码
+    } & WXCommonObj)
+
+    appendFileSync(filePath: string, data: string | ArrayBuffer, encoding?: WXFileEncoding): string
+
+    // 删除该小程序下已保存的本地缓存文件
+    removeSavedFile(obj: {
+        filePath: string
+    } & WXCommonObj)
+
+    // 获取该小程序下的 本地临时文件 或 本地缓存文件 信息
+    getFileInfo(obj: {
+        filePath: string
+        success?: (res: { size: number }) => void
+        fail?: WXCommonCallback
+        complete?: WXCommonCallback
+    })
 }
 
 interface WXFileAPI {
@@ -189,14 +237,14 @@ interface WXFileAPI {
 }
 
 interface WXGetStorageObj {
-    key: string;
-    success: (res: { data: any, [propName: string]: any }) => void;
-    fail?: WXCommonCallback;
-    complete?: WXCommonCallback;
+    key: string
+    success?: (res: { data: any }) => void
+    fail?: WXCommonCallback
+    complete?: WXCommonCallback
 }
 
 interface WXGetStorageInfoObj {
-    success: (res: { keys: string[], currentSize: number, limitSize: number, [propName: string]: any }) => void;
+    success?: (res: { keys: string[], currentSize: number, limitSize: number }) => void;
     fail?: WXCommonCallback;
     complete?: WXCommonCallback;
 }
@@ -255,16 +303,22 @@ interface WXOnShowOptions {
 }
 
 interface WXSystemAPI {
-    // 系统信息
+    // ## 系统信息
+    
     getSystemInfo(obj: { success: (res: WXSystemInfo) => void, fail?: WXCommonCallback, complete?: WXCommonCallback });
     getSystemInfoSync(): WXSystemInfo;
 
-    // 	// getNetworkType(obj: { success: (res: { networkType: string, [propName: string]: any }) => void, fail?: WXCommonCallback, complete?: WXCommonCallback });
-    // 	// onAccelerometerChange(cb: (res: { x: number, y: number, z: number, [propName: string]: any }) => void);
-    // 	// onCompassChange(cb: (res: { direction: number, [propName: string]: any }) => void);
-    // 	// makePhoneCall(obj: { phoneNumber: string } & WXCommonObj);
+    // ## 系统事件
 
-    // 生命周期
+    // 监听全局错误事件
+    onError(callback: (res: {
+        message: string
+        stack: string
+    }) => void)
+    offError(callback: Function)
+
+    // ## 生命周期
+
     // 退出当前小游戏
     exitMiniProgram(obj?: WXCommonObj)
     getLaunchOptionsSync(): WXOnShowOptions & {
