@@ -1,4 +1,4 @@
-# wx.d.ts
+# api.d.ts
 API typescript 声明 （仍在补充中）
 * 微信小程序
 * 微信小游戏
