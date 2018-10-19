@@ -7,6 +7,7 @@ type WXMergedAPI =
     WXDebugAPI &
     WXOpenAPI &
     WXShareAPI &
+    WXUserInterfaceAPI &
     WXUndocumentedAPI;
 
 interface WXCanvasFileObject {
@@ -304,7 +305,7 @@ interface WXOnShowOptions {
 
 interface WXSystemAPI {
     // ## 系统信息
-    
+
     getSystemInfo(obj: { success: (res: WXSystemInfo) => void, fail?: WXCommonCallback, complete?: WXCommonCallback });
     getSystemInfoSync(): WXSystemInfo;
 
@@ -351,6 +352,24 @@ interface WXUserInfoObject {
     province: string	//	用户所在省份
     country: string		//	用户所在国家
     language: string	//	用户的语言，简体中文为zh_CN
+}
+
+interface WXUserInterfaceAPI {
+    showModal(obj: {
+        title: string
+        content: string
+        showCancel?: boolean // true
+        cancelText: string
+        cancelColor?: string // 文字颜色，必须是 16 进制格式的颜色字符串
+        confirmText: string
+        confirmColor?: string
+        success: (res: {
+            confirm: boolean // 为 true 时，表示用户点击了确定按钮
+            cancel: boolean // 为 true 时，表示用户点击了取消（用于 Android 系统区分点击蒙层关闭还是点击取消按钮关闭）
+        }) => void
+        fail: () => void
+        complete: () => void
+    })
 }
 
 type WXScopeValue = "scope.userInfo" | "scope.userLocation" | "scope.address" | "scope.invoiceTitle" | "scope.werun" | "scope.record" | "scope.writePhotosAlbum" | "scope.camera"
