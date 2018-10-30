@@ -344,6 +344,28 @@ interface WXDebugAPI {
     } & WXCommonObj)
 }
 
+interface WXUserInfoButtonStyle {
+    left: number      //		是	左上角横坐标	
+    top: number      //		是	左上角纵坐标	
+    width: number      //		是	宽度	
+    height: number      //		是	高度	
+    backgroundColor: string      //		是	背景颜色	
+    borderColor: string      //		是	边框颜色	
+    borderWidth: number      //		是	边框宽度	
+    borderRadius: number      //		是	边框圆角	
+    textAlign: "left" | "center" | "right"      //		是	文本的水平居中方式	
+    fontSize: number      //		是	字号	
+    lineHeight: number      //		是	文本的行高    
+}
+
+interface WXUserInfoButton {
+    show()
+    hide()
+    destroy()
+    onTap(cb: Function)
+    offTap(cb: Function)
+}
+
 interface WXUserInfoObject {
     nickName: string;	// 	用户昵称
     avatarUrl: string	//	用户头像，最后一个数值代表正方形头像大小（有0、46、64、96、132数值可选，0代表132*132正方形头像），用户没有头像时该项为空。若用户更换头像，原有头像URL将失效。
@@ -363,12 +385,12 @@ interface WXUserInterfaceAPI {
         cancelColor?: string // 文字颜色，必须是 16 进制格式的颜色字符串
         confirmText: string
         confirmColor?: string
-        success: (res: {
+        success?: (res: {
             confirm: boolean // 为 true 时，表示用户点击了确定按钮
             cancel: boolean // 为 true 时，表示用户点击了取消（用于 Android 系统区分点击蒙层关闭还是点击取消按钮关闭）
         }) => void
-        fail: () => void
-        complete: () => void
+        fail?: () => void
+        complete?: () => void
     })
 }
 
@@ -450,6 +472,15 @@ interface WXOpenAPI {
         fail?: () => void,	// 选填	接口调用失败的回调函数
         complete?: () => void,	// 选填	接口调用结束的回调函数（调用成功、失败都会执行）		
     })
+
+    createUserInfoButton(obj: {
+        type: "text" | "image"
+        text: string
+        image: string
+        style: WXUserInfoButtonStyle
+        withCredentials: boolean
+        lang?: "en" | "zh_CN" | "zh_TW"
+    }): WXUserInfoButton
 
     getUserInfo(obj: {
 		/*
