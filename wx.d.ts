@@ -1,6 +1,6 @@
 type WXCommonCallback = (res?: any) => void;
 type WXMergedAPI =
-    //WXNetAPI & 
+    WXNetAPI &
     WXMediaAPI &
     WXStorageAPI &
     //WXLocationAPI & 
@@ -58,12 +58,15 @@ interface WXTouchEvent extends WXBaseEvent {
     changedTouches: Array<WXEventTouch | WXEventCanvasTouch>	//	触摸事件，当前变化的触摸点信息的数组	
 }
 
-// interface WXNetAPIRequestObj extends WXCommonObj {
-// 	url: string;
-// 	data?: Object | string;
-// 	header?: Object;
-// 	method?: string;
-// }
+interface WXNetAPIRequestObj extends WXCommonObj {
+    url: string
+    data?: Object | string | ArrayBuffer
+    header?: Object // 设置请求的 header，header 中不能设置 Referer。content-type 默认为 application/json
+    method?: string // GET
+    dataType?: string // json
+    responseType?: string // text
+}
+
 // interface WXNetAPIDownloadFileObj {
 // 	url: string;
 // 	header?: Object;
@@ -84,18 +87,20 @@ interface WXTouchEvent extends WXBaseEvent {
 // 	header?: Object;
 // 	method?: string;
 // }
-// interface WXNetAPI {
-// 	request(obj: WXNetAPIRequestObj);
-// 	downloadFile(obj: WXNetAPIDownloadFileObj);
-// 	uploadFile(obj: WXNetAPIUploadFileObj);
-// 	connectSocket(obj: WXNetAPIConnectSocketObj);
-// 	onSocketOpen(cb: WXCommonCallback);
-// 	onSocketError(cb: WXCommonCallback);
-// 	sendSocketMessage(obj: { data: string | ArrayBuffer } & WXCommonObj);
-// 	onSocketMessage(callback: (data: string | ArrayBuffer) => void);
-// 	closeSocket();
-// 	onSocketClose(cb: WXCommonCallback);
-// }
+
+interface WXNetAPI {
+    request(obj: WXNetAPIRequestObj)
+    // 	downloadFile(obj: WXNetAPIDownloadFileObj);
+    // 	uploadFile(obj: WXNetAPIUploadFileObj);
+    // 	connectSocket(obj: WXNetAPIConnectSocketObj);
+    // 	onSocketOpen(cb: WXCommonCallback);
+    // 	onSocketError(cb: WXCommonCallback);
+    // 	sendSocketMessage(obj: { data: string | ArrayBuffer } & WXCommonObj);
+    // 	onSocketMessage(callback: (data: string | ArrayBuffer) => void);
+    // 	closeSocket();
+    // 	onSocketClose(cb: WXCommonCallback);
+}
+
 // interface WXChooseImageObj {
 // 	count?: number;
 // 	sizeType?: string[];
@@ -285,7 +290,7 @@ interface WXStorageAPI {
 
     removeStorage(obj: WXGetStorageObj);
     removeStorageSync(key: string);
-    
+
     clearStorage();
     clearStorageSync();
 }
@@ -335,11 +340,17 @@ interface WXDeviceAPI {
     // 	// makePhoneCall(obj: { phoneNumber: string } & WXCommonObj);
 }
 
-// interface WXToast extends WXCommonObj {
-// 	title: string;
-// 	icon?: string;
-// 	duration?: number;
-// }
+interface WXToast extends WXCommonObj {
+    title: string
+    icon?: string
+    duration?: number
+}
+
+interface WXLoading extends WXCommonObj {
+    title: string
+    mask?: boolean // false
+}
+
 // interface WXModal {
 // 	title: string;
 // 	content: string;
@@ -428,8 +439,10 @@ interface WXDeviceAPI {
 // 	setMiterLimit(miterLimit: number);
 // }
 interface WXUIAPI {
-    // 	showToast(obj: WXToast);
-    // 	hideToast();
+    showToast(obj: WXToast)
+    hideToast(obj?: WXCommonObj)
+    showLoading(obj: WXLoading)
+    hideLoading(obj?: WXCommonObj)
     // 	showModal(obj: WXModal);
     // 	showActionSheet(obj: WXActionSheet);
     // 	setNavigationBarTitle(obj: { title: string } & WXCommonObj);
