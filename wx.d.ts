@@ -443,7 +443,22 @@ interface WXUIAPI {
     hideToast(obj?: WXCommonObj)
     showLoading(obj: WXLoading)
     hideLoading(obj?: WXCommonObj)
-    // 	showModal(obj: WXModal);
+    showModal(obj: {
+        title: string
+        content: string
+        showCancel?: boolean // true
+        cancelText: string
+        cancelColor?: string // 文字颜色，必须是 16 进制格式的颜色字符串
+        confirmText: string
+        confirmColor?: string
+        success?: (res: {
+            confirm: boolean // 为 true 时，表示用户点击了确定按钮
+            cancel: boolean // 为 true 时，表示用户点击了取消（用于 Android 系统区分点击蒙层关闭还是点击取消按钮关闭）
+        }) => void
+        fail?: () => void
+        complete?: () => void
+    })
+
     // 	showActionSheet(obj: WXActionSheet);
     // 	setNavigationBarTitle(obj: { title: string } & WXCommonObj);
     // 	showNavigationBarLoading();

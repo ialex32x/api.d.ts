@@ -376,7 +376,23 @@ interface WXUserInfoObject {
     language: string	//	用户的语言，简体中文为zh_CN
 }
 
+interface WXToast extends WXCommonObj {
+    title: string
+    icon?: string
+    duration?: number
+}
+
+interface WXLoading extends WXCommonObj {
+    title: string
+    mask?: boolean // false
+}
+
 interface WXUserInterfaceAPI {
+    showToast(obj: WXToast)
+    hideToast(obj?: WXCommonObj)
+    showLoading(obj: WXLoading)
+    hideLoading(obj?: WXCommonObj)
+
     showModal(obj: {
         title: string
         content: string
