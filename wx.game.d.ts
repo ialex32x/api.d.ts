@@ -1,5 +1,6 @@
 type WXCommonCallback = (res?: any) => void;
 type WXMergedAPI =
+    WXUpdateAPI &
     WXRenderAPI &
     WXFileAPI &
     WXStorageAPI &
@@ -9,6 +10,17 @@ type WXMergedAPI =
     WXShareAPI &
     WXUserInterfaceAPI &
     WXUndocumentedAPI;
+
+interface WXUpdateAPI {
+    getUpdateManager(): WXUpdateManager
+}
+
+interface WXUpdateManager {
+    onCheckForUpdate(cb: (res: { hasUpdate: boolean }) => void)
+    onUpdateReady(cb: Function)
+    onUpdateFailed(cb: Function)
+    applyUpdate()
+}
 
 interface WXCanvasFileObject {
     // 属性	类型	         // 默认值	          是否必填	说明	支持版本
@@ -397,9 +409,9 @@ interface WXUserInterfaceAPI {
         title: string
         content: string
         showCancel?: boolean // true
-        cancelText: string
+        cancelText?: string
         cancelColor?: string // 文字颜色，必须是 16 进制格式的颜色字符串
-        confirmText: string
+        confirmText?: string
         confirmColor?: string
         success?: (res: {
             confirm: boolean // 为 true 时，表示用户点击了确定按钮
