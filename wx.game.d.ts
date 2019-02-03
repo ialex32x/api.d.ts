@@ -323,6 +323,11 @@ interface WXSystemAPI {
 
     // ## 系统事件
 
+    // 震动 15ms
+    vibrateShort(obj?: WXCommonObj)
+    // 震动 400ms
+    vibrateLong(obj?: WXCommonObj)
+
     // 监听全局错误事件
     onError(callback: (res: {
         message: string
